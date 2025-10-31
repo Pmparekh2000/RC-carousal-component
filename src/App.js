@@ -1,23 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import Carousal from "./components/Carousal";
+import { useEffect, useRef, useState } from "react";
+import useFetchData from "./hooks/useFetchData";
+import { PHOTOS_API } from "./utils/constants";
 
 function App() {
+  const [photosData, setPhotosData] = useState([]);
+
+  const {
+    data: apiPhotosData,
+    isLoading,
+    error,
+  } = useFetchData(`${PHOTOS_API}?limit=8`);
+
+  useEffect(() => {
+    setPhotosData(
+      apiPhotosData?.products?.map((product) => {
+        return {
+          id: product?.id,
+          title: product?.title,
+          thumbnail: product?.thumbnail,
+        };
+      })
+    );
+  }, [apiPhotosData]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="carousal-container">
+      <Carousal
+        images={photosData}
+        error={error}
+        isLoading={isLoading}
+        imageLimit={4}
+        customPrevButton={(onClick) => (
+          <buton
+            className="btn prev"
+            style={{ background: "red" }}
+            onClick={onClick}
+          >
+            Prev
+          </buton>
+        )}
+        customNextButton={(onClick) => (
+          <buton className="btn next" onClick={onClick}>
+            Next
+          </buton>
+        )}
+        onImageClick={(image, index) => {}}
+        imagesPerSlide={3}
+      />
     </div>
   );
 }
